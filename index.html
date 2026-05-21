@@ -1,857 +1,321 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <title>MAPPA MENTALE</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Il Giappone - Scheda e Flashcard</title>
   <style>
-    *{
-      box-sizing:border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    html,body{
-      margin:0;
-      padding:0;
-      height:100%;
-      overflow:hidden;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:#f1f2f5;
-    }
-    body{
-      display:flex;
-      flex-direction:column;
-    }
-    header{
-      flex:0 0 auto;
-      padding:8px 10px 6px 10px;
-      background:#ffffff;
-      border-bottom:1px solid rgba(0,0,0,.08);
-      display:flex;
-      align-items:center;
-      gap:6px;
-      font-size:14px;
-      position:relative;
-      z-index:10;
-    }
-    header .group{
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      margin-right:6px;
-    }
-    header .spacer{
-      flex:1 1 auto;
-    }
-    header button{
-      border-radius:999px;
-      border:1px solid rgba(0,0,0,.12);
-      background:#ffffff;
-      padding:5px 10px;
-      cursor:pointer;
-      font-size:13px;
-      line-height:1;
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      box-shadow:0 1px 2px rgba(0,0,0,.04);
-    }
-    header button.small{
-      padding:3px 7px;
-      font-size:12px;
-    }
-    header button:hover{
-      background:#f3f4f6;
-    }
-    header button:active{
-      transform:translateY(1px);
-      box-shadow:none;
-    }
-    header button.active{
-      background:#e0f2ff;
-      border-color:#3b82f6;
-    }
-    header .label{
-      font-weight:500;
-      margin-right:4px;
-    }
-    header .status{
-      font-size:12px;
-      color:#555;
-      padding:4px 8px;
-      border-radius:999px;
-      background:#f3f4f6;
-    }
-    header select,
-    header input[type="color"]{
-      font-size:13px;
-      padding:4px 6px;
-      border-radius:999px;
-      border:1px solid rgba(0,0,0,.18);
-      background:#ffffff;
-    }
-    header input[type="color"]{
-      width:34px;
-      height:22px;
-      padding:0;
-    }
-    header .title{
-      font-weight:700;
-      letter-spacing:0.12em;
-      font-size:18px;
-      margin-right:8px;
-    }
-    header .logoCircle{
-      width:32px;
-      height:32px;
-      border-radius:999px;
-      border:2px solid #000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      margin-left:8px;
-    }
-    main{
-      flex:1 1 auto;
-      position:relative;
-      overflow:hidden;
-    }
-    .board{
-      position:absolute;
-      inset:0;
-      background:#f1f2f5;
-      overflow:hidden;
-      touch-action:none;
-    }
-    .viewport{
-      position:absolute;
-      left:0;
-      top:0;
-      width:100%;
-      height:100%;
-      transform-origin:0 0;
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #222;
+      line-height: 1.6;
     }
 
-    .pop{
-      position:absolute;
-      min-width:120px;
-      max-width:360px;
-      padding:8px 14px;
-      border-radius:999px;
-      background:#ffffff;
-      border:2px solid #000000;
-      box-shadow:0 4px 12px rgba(0,0,0,.12);
-      box-sizing:border-box;
-      user-select:none;
-      cursor:grab;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      touch-action: none;
-      pointer-events:auto;
-    }
-    .pop:active{ cursor:grabbing; }
-    .pop.selected{ outline:3px solid rgba(0,120,255,.25); }
-    .pop.linking{ background:rgba(0,120,255,.08)!important; border-color:rgba(0,120,255,.35)!important; }
-
-    .body{
-      width:100%;
-      border:0;
-      outline:0;
-      resize:none;
-      overflow:hidden;
-      background:transparent;
-      color:inherit;
-      font-size:14px;
-      line-height:1.25;
-      padding:0;
-      margin:0;
-      box-sizing:border-box;
-      min-height:1.25em;
-      white-space:pre-wrap;
-      word-break:break-word;
-      text-align:center;
+    header {
+      background: linear-gradient(135deg, #c62828, #ef5350);
+      color: white;
+      padding: 35px 20px;
+      text-align: center;
     }
 
-    .linkLine{
-      pointer-events:stroke;
-      fill: none;
-      cursor:pointer;
-      stroke: rgba(0,0,0,.55);
-      stroke-width: 2;
-      stroke-linecap: round;
-    }
-    .linkLine.selected{
-      stroke-width:3;
-      stroke:rgba(37,99,235,.9);
+    header h1 {
+      margin: 0;
+      font-size: 2.4rem;
     }
 
-    .linkLabel{
-      font-size:11px;
-      padding:2px 6px;
-      border-radius:999px;
-      background:#f9fafb;
-      border:1px solid rgba(0,0,0,.12);
-      white-space:nowrap;
-      pointer-events:auto;
-      cursor:pointer;
+    header p {
+      margin-top: 10px;
+      font-size: 1.1rem;
     }
 
-    .zoomButtons{
-      position:absolute;
-      right:10px;
-      bottom:10px;
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-      z-index:5;
-    }
-    .zoomButtons button{
-      border-radius:999px;
-      border:1px solid rgba(0,0,0,.18);
-      background:#ffffff;
-      width:34px;
-      height:34px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      font-size:18px;
-      box-shadow:0 2px 6px rgba(0,0,0,.15);
-    }
-    .zoomButtons button:hover{
-      background:#f3f4f6;
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px;
     }
 
-    @media print{
-      header, .zoomButtons{
-        display:none!important;
+    section {
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      color: #b71c1c;
+      margin-top: 0;
+      border-left: 6px solid #ef5350;
+      padding-left: 12px;
+    }
+
+    .testo p {
+      font-size: 1.05rem;
+    }
+
+    .flashcard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+
+    .flashcard {
+      perspective: 1000px;
+      cursor: pointer;
+      min-height: 180px;
+    }
+
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 180px;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+
+    .flashcard.girata .flashcard-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flashcard-front,
+    .flashcard-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      min-height: 180px;
+      backface-visibility: hidden;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 18px;
+      box-sizing: border-box;
+      font-size: 1.15rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .flashcard-front {
+      background: #ffffff;
+      border: 3px solid #ef5350;
+      color: #b71c1c;
+      font-weight: bold;
+    }
+
+    .flashcard-back {
+      background: #b71c1c;
+      color: white;
+      transform: rotateY(180deg);
+    }
+
+    .istruzioni {
+      background: #fff3f3;
+      border-left: 6px solid #ef5350;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 1.05rem;
+    }
+
+    button {
+      background: #b71c1c;
+      color: white;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #8e0000;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    @media print {
+      .flashcard-front,
+      .flashcard-back {
+        position: static;
+        transform: none;
+        backface-visibility: visible;
+        margin-bottom: 10px;
       }
-      body,html{
-        background:#ffffff;
-        height:auto;
-        overflow:visible;
+
+      .flashcard-inner,
+      .flashcard,
+      .flashcard.girata .flashcard-inner {
+        transform: none;
+        height: auto;
       }
-      .board{
-        position:relative;
-        width:100%;
-        height:auto;
-        overflow:visible;
-        background:#ffffff;
-      }
-      .viewport{
-        transform:none!important;
-        position:relative;
-      }
-      .pop{
-        box-shadow:none!important;
-        page-break-inside:avoid;
-      }
-      svg{
-        overflow:visible!important;
+
+      button {
+        display: none;
       }
     }
-
   </style>
 </head>
 <body>
-<header>
-  <button id="btnNew" type="button">+ Nuovo pop</button>
-  <button id="btnMove" type="button">Sposta</button>
-  <button id="btnLink" type="button">Collega</button>
-  <button id="btnDelete" type="button">Elimina</button>
+  <header>
+    <h1>Il Giappone</h1>
+    <p>Testo di studio con flashcard interattive</p>
+  </header>
 
-  <div class="group">
-    <button id="btnExportPdf" type="button">Stampa in PDF</button>
-    <button id="btnExportJson" type="button">Salva in JSON</button>
-    <button id="btnExportHtml" type="button">Salva HTML</button>
-    <button id="btnImport" type="button">Importa HTML/JSON</button>
-  </div>
+  <main>
+    <section class="testo">
+      <h2>Testo di studio</h2>
+      <p>Il Giappone è un paese con capitale Tokyo. La sua forma di stato è la monarchia parlamentare: esiste ancora un imperatore, ma il Parlamento fa le leggi. La moneta del Giappone è lo yen.</p>
 
-  <div class="group">
-    <span class="label">Testo:</span>
-    <input id="colorPicker" type="color" value="#000000" title="Colore testo e bordi">
-    <button id="btnSmaller" type="button" class="small">A-</button>
-    <button id="btnBigger" type="button" class="small">A+</button>
-    <button id="btnBold" type="button" class="small">B</button>
-  </div>
+      <p>Il Giappone è un arcipelago, cioè un insieme di tante isole. Le isole principali sono quattro. Tra queste, Honshu è la più grande e occupa circa il 60% del territorio giapponese. Un’altra isola importante è Hokkaido.</p>
 
-  <span id="status" class="status">Pronto</span>
+      <p>Il territorio giapponese è soprattutto montuoso ed è ricco di vulcani. Questo accade perché il Giappone si trova vicino alla linea di divisione di placche terrestri in movimento. Per questo motivo il Giappone è famoso anche per i terremoti. Il monte più alto è il monte Fuji, alto circa 3.700 metri.</p>
 
-  <div class="spacer"></div>
+      <p>In Giappone ci sono molti fiumi. Il fiume più lungo è lo Shinano, lungo circa 370 chilometri. Il lago più grande è il lago Biwa. Molti laghi giapponesi sono di origine vulcanica.</p>
 
-  <span class="title">MAPPA MENTALE</span>
-  <div class="logoCircle">A M</div>
-</header>
+      <p>Il clima cambia molto da nord a sud. A nord ci sono inverni freddi e nevosi. Al centro il clima è temperato. A sud il clima è subtropicale, con inverni miti ed estati molto piovose.</p>
 
-<main>
-  <div id="board" class="board">
-    <div id="viewport" class="viewport"></div>
-    <svg id="wires" xmlns="http://www.w3.org/2000/svg" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;">
-      <defs>
-        <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0, 10 3.5, 0 7" fill="#000"></polygon>
-        </marker>
-      </defs>
-    </svg>
-    <div class="zoomButtons">
-      <button id="zoomIn">+</button>
-      <button id="zoomOut">-</button>
-    </div>
-  </div>
-</main>
+      <p>Il Giappone è molto abitato ed è famoso per le sue grandi metropoli, cioè città molto grandi e tecnologiche. Però il Giappone ha anche molta natura e molte foreste.</p>
 
-<script>
-(function(){
-  var board   = document.getElementById("board");
-  var viewport= document.getElementById("viewport");
-  var wires   = document.getElementById("wires");
+      <p>Le religioni più diffuse sono lo shintoismo e il buddhismo. Spesso i giapponesi si sentono sia shintoisti sia buddhisti. È presente anche il cattolicesimo, ma in misura minore.</p>
 
-  var btnNew      = document.getElementById("btnNew");
-  var btnMove     = document.getElementById("btnMove");
-  var btnLink     = document.getElementById("btnLink");
-  var btnDelete   = document.getElementById("btnDelete");
-  var btnExportPdf= document.getElementById("btnExportPdf");
-  var btnExportJson= document.getElementById("btnExportJson");
-  var btnExportHtml= document.getElementById("btnExportHtml");
-  var btnImport   = document.getElementById("btnImport");
+      <p>L’economia giapponese è molto importante. Il Giappone è famoso per la tecnologia e per molti marchi conosciuti, come Nintendo, Sony, Toyota e Honda. Anche se non ha molte materie prime, dopo la Seconda guerra mondiale il Giappone ha saputo ricostruire una forte economia.</p>
 
-  var colorPicker = document.getElementById("colorPicker");
-  var btnSmaller  = document.getElementById("btnSmaller");
-  var btnBigger   = document.getElementById("btnBigger");
-  var btnBold     = document.getElementById("btnBold");
+      <p>L’agricoltura è legata soprattutto alla coltivazione del riso. Si sta sviluppando anche l’idroponica, cioè una tecnica che permette di coltivare piante con le radici nell’acqua. Anche la pesca è molto importante, perché il Giappone è formato da molte isole.</p>
+    </section>
 
-  var statusSpan  = document.getElementById("status");
-  var zoomInBtn   = document.getElementById("zoomIn");
-  var zoomOutBtn  = document.getElementById("zoomOut");
+    <section>
+      <h2>Flashcard</h2>
+      <div class="istruzioni">
+        Clicca su ogni carta per vedere la risposta. Clicca di nuovo per tornare alla domanda.
+      </div>
 
-  var pops = [];
-  var links = [];
+      <div class="flashcard-grid">
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cos’è la monarchia parlamentare?</div>
+            <div class="flashcard-back">È una forma di stato dove esiste ancora un re o un imperatore, ma le leggi sono fatte dal Parlamento.</div>
+          </div>
+        </div>
 
-  var selectedBoxId = null;
-  var selectedLinkId = null;
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cos’è un arcipelago?</div>
+            <div class="flashcard-back">Un arcipelago è un insieme di molte isole.</div>
+          </div>
+        </div>
 
-  var moveMode = false;
-  var linkingFrom = null;
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cosa sono le placche terrestri?</div>
+            <div class="flashcard-back">Sono grandi parti della crosta terrestre che si muovono lentamente.</div>
+          </div>
+        </div>
 
-  var view = { x:0, y:0, s:1 };
-  var isPanning = false;
-  var panStart = { x:0, y:0 };
-  var panViewStart = { x:0, y:0 };
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cosa significa territorio montuoso?</div>
+            <div class="flashcard-back">Significa un territorio con molte montagne.</div>
+          </div>
+        </div>
 
-  function uid(){
-    return "id" + Math.random().toString(36).slice(2,10);
-  }
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cosa significa clima continentale?</div>
+            <div class="flashcard-back">È un clima con inverni freddi ed estati più calde.</div>
+          </div>
+        </div>
 
-  function setStatus(t){
-    statusSpan.textContent = t;
-  }
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cosa significa clima temperato?</div>
+            <div class="flashcard-back">È un clima con temperature moderate, non troppo fredde e non troppo calde.</div>
+          </div>
+        </div>
 
-  function setLinkMode(on) {
-    if (on) {
-      if (!selectedBoxId) {
-        setStatus("Seleziona prima un box da cui partire.");
-        btnLink.classList.remove("active");
-        return;
-      }
-      linkingFrom = selectedBoxId;
-      btnLink.classList.add("active");
-      var a = document.querySelectorAll(".pop");
-      for (var i=0;i<a.length;i++) {
-        a[i].classList.toggle("linking", a[i].dataset.id === linkingFrom);
-      }
-      setStatus("Modalita collega: clicca un altro box.");
-      return;
-    } else {
-      linkingFrom = null;
-      btnLink.classList.remove("active");
-      var b = document.querySelectorAll(".pop");
-      for (var j=0;j<b.length;j++) b[j].classList.remove("linking");
-      setStatus("Pronto");
-    }
-  }
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cosa significa clima subtropicale?</div>
+            <div class="flashcard-back">È un clima con inverni miti ed estati molto calde e piovose.</div>
+          </div>
+        </div>
 
-  function setMoveMode(on) {
-    moveMode = !!on;
-    if (moveMode) {
-      btnMove.classList.add("active");
-      setStatus("Modalita sposta (trascina sfondo).");
-    } else {
-      btnMove.classList.remove("active");
-      setStatus("Pronto");
-    }
-  }
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cosa sono le precipitazioni?</div>
+            <div class="flashcard-back">Le precipitazioni sono pioggia, neve o grandine che cadono dal cielo.</div>
+          </div>
+        </div>
 
-  function clearSelection() {
-    selectedBoxId = null;
-    selectedLinkId = null;
-    var nodes = document.querySelectorAll(".pop");
-    for (var i=0; i<nodes.length; i++) nodes[i].classList.remove("selected");
-    var lines = wires.querySelectorAll(".linkLine");
-    for (var j=0;j<lines.length;j++) lines[j].classList.remove("selected");
-    updateTextControls();
-  }
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cosa sono le metropoli?</div>
+            <div class="flashcard-back">Le metropoli sono città molto grandi e molto popolate.</div>
+          </div>
+        </div>
 
-  function selectBox(id) {
-    selectedBoxId = id;
-    selectedLinkId = null;
-    var nodes = document.querySelectorAll(".pop");
-    for (var i=0; i<nodes.length; i++) {
-      nodes[i].classList.toggle("selected", nodes[i].dataset.id === id);
-    }
-    var lines = wires.querySelectorAll(".linkLine");
-    for (var j=0;j<lines.length;j++) lines[j].classList.remove("selected");
-    setStatus("Box selezionato.");
-    updateTextControls();
-  }
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cos’è lo shintoismo?</div>
+            <div class="flashcard-back">È una religione giapponese legata alla natura, agli antenati e all’imperatore.</div>
+          </div>
+        </div>
 
-  function selectLink(id) {
-    selectedLinkId = id;
-    selectedBoxId = null;
-    var nodes = document.querySelectorAll(".pop");
-    for (var i=0; i<nodes.length; i++) {
-      nodes[i].classList.remove("selected");
-    }
-    var lines = wires.querySelectorAll(".linkLine");
-    for (var j=0;j<lines.length;j++) {
-      lines[j].classList.toggle("selected", lines[j].dataset.linkid === id);
-    }
-    setStatus("Collegamento selezionato.");
-    updateTextControls();
-  }
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cos’è il buddhismo?</div>
+            <div class="flashcard-back">È una religione nata in Asia che insegna la pace interiore e la meditazione.</div>
+          </div>
+        </div>
 
-  function autoGrow(ta, popRef) {
-    // reset altezza per misurare correttamente
-    ta.style.height = "auto";
-    var newH = ta.scrollHeight;
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cosa significa PIL?</div>
+            <div class="flashcard-back">Il PIL è il valore di tutti i prodotti e servizi creati in un paese.</div>
+          </div>
+        </div>
 
-    // memorizza l'altezza massima raggiunta dal box
-    if (popRef) {
-      if (!popRef._maxHeight || newH > popRef._maxHeight) {
-        popRef._maxHeight = newH;
-      }
-      newH = popRef._maxHeight;
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cos’è il debito pubblico?</div>
+            <div class="flashcard-back">È il denaro che uno Stato deve restituire perché ha speso più di quanto ha guadagnato.</div>
+          </div>
+        </div>
+
+        <div class="flashcard" onclick="giraCarta(this)">
+          <div class="flashcard-inner">
+            <div class="flashcard-front">Che cos’è l’idroponica?</div>
+            <div class="flashcard-back">È una tecnica agricola che coltiva le piante direttamente nell’acqua.</div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="resetCarte()">Rimetti tutte le carte sulla domanda</button>
+    </section>
+  </main>
+
+  <footer>
+    Pagina didattica sul Giappone
+  </footer>
+
+  <script>
+    function giraCarta(carta) {
+      carta.classList.toggle('girata');
     }
 
-    ta.style.height = newH + "px";
-  }
-
-  function resizeSelectedTextarea() {
-    if (!selectedBoxId) return;
-    var ta = document.querySelector('.pop[data-id="'+selectedBoxId+'"] .body');
-    var p = pops.find(function(pp){ return pp.id === selectedBoxId; });
-    if (ta && p) autoGrow(ta, p);
-  }
-
-  function createPop(x, y) {
-    var p = { id: uid(), x: x, y: y, text: "", color:"#000000", size:"small", bold:false, _maxHeight:0 };
-    pops.push(p);
-    render();
-    selectBox(p.id);
-  }
-
-  function addLink(from, to) {
-    if (!from || !to || from === to) return;
-    for (var i=0;i<links.length;i++) {
-      if (links[i].from === from && links[i].to === to) return;
+    function resetCarte() {
+      const carte = document.querySelectorAll('.flashcard');
+      carte.forEach(carta => carta.classList.remove('girata'));
     }
-    links.push({ id: uid(), from: from, to: to, end: "arrow", shape: "straight" });
-  }
-
-  function deleteSelected() {
-    if (selectedLinkId) {
-      links = links.filter(function (l) { return l.id !== selectedLinkId; });
-      selectedLinkId = null;
-      renderLinks();
-      setStatus("Collegamento eliminato.");
-      return;
-    }
-    if (selectedBoxId) {
-      var id = selectedBoxId;
-      pops = pops.filter(function (p) { return p.id !== id; });
-      links = links.filter(function (l) { return l.from !== id && l.to !== id; });
-      selectedBoxId = null;
-      if (linkingFrom === id) setLinkMode(false);
-      render();
-      setStatus("Box eliminato.");
-      return;
-    }
-  }
-
-  function getPopById(id) {
-    for (var i=0;i<pops.length;i++){
-      if (pops[i].id === id) return pops[i];
-    }
-    return null;
-  }
-
-  function updateTextControls(){
-    var p = selectedBoxId ? getPopById(selectedBoxId) : null;
-    btnSmaller.disabled = !p;
-    btnBigger.disabled  = !p;
-    btnBold.disabled    = !p;
-    colorPicker.disabled= !p;
-    if (p) {
-      colorPicker.value = p.color || "#000000";
-      btnBold.classList.toggle("active", !!p.bold);
-    } else {
-      btnBold.classList.remove("active");
-    }
-  }
-
-  function applyView(){
-    viewport.style.transform = "translate(" + view.x + "px," + view.y + "px) scale(" + view.s + ")";
-  }
-
-  function screenToWorld(clientX, clientY){
-    var br = board.getBoundingClientRect();
-    var sx = clientX - br.left;
-    var sy = clientY - br.top;
-    return { x: (sx - view.x)/view.s, y: (sy - view.y)/view.s };
-  }
-
-  applyView();
-
-  board.addEventListener("pointerdown", function(e){
-    if (e.button !== 0) return;
-
-    if (moveMode || (!e.target.closest(".pop") && !e.target.closest("textarea"))) {
-      isPanning = true;
-      panStart.x = e.clientX;
-      panStart.y = e.clientY;
-      panViewStart.x = view.x;
-      panViewStart.y = view.y;
-      board.setPointerCapture(e.pointerId);
-      e.preventDefault();
-      return;
-    }
-
-    if (e.target === board || e.target === viewport || e.target === wires){
-      clearSelection();
-    }
-  });
-
-  board.addEventListener("pointermove", function(e){
-    if (!isPanning) return;
-    var dx = e.clientX - panStart.x;
-    var dy = e.clientY - panStart.y;
-    view.x = panViewStart.x + dx;
-    view.y = panViewStart.y + dy;
-    applyView();
-  });
-
-  board.addEventListener("pointerup", function(e){
-    if (isPanning){
-      isPanning = false;
-      board.releasePointerCapture(e.pointerId);
-    }
-  });
-
-  board.addEventListener("dblclick", function(e){
-    if (e.target.closest(".pop") || e.target.closest("textarea")) return;
-    var pos = screenToWorld(e.clientX, e.clientY);
-    createPop(pos.x, pos.y);
-  });
-
-  function getPopBoxInBoardCoords(popId) {
-    var el = viewport.querySelector('.pop[data-id="'+popId+'"]');
-    if (!el) return null;
-    var rect = el.getBoundingClientRect();
-    var br = board.getBoundingClientRect();
-    var x = rect.left - br.left;
-    var y = rect.top  - br.top;
-    var w = rect.width;
-    var h = rect.height;
-    return { x:x, y:y, w:w, h:h, cx:x+w/2, cy:y+h/2, hw:w/2, hh:h/2 };
-  }
-
-  var NS = "http://www.w3.org/2000/svg";
-
-  function edgePoint(cx, cy, hw, hh, dx, dy) {
-    if (dx === 0 && dy === 0) return { x:cx, y:cy };
-    var adx = Math.abs(dx);
-    var ady = Math.abs(dy);
-    var scale;
-    if (adx*hh > ady*hw) {
-      scale = hw / adx;
-    } else {
-      scale = hh / ady;
-    }
-    return { x:cx + dx*scale, y:cy + dy*scale };
-  }
-
-  function renderLinks(){
-    while (wires.firstChild && wires.firstChild.tagName !== "defs") {
-      wires.removeChild(wires.lastChild);
-    }
-
-    links.forEach(function(l){
-      var A = getPopBoxInBoardCoords(l.from);
-      var B = getPopBoxInBoardCoords(l.to);
-      if (!A || !B) return;
-
-      var dx = B.cx - A.cx;
-      var dy = B.cy - A.cy;
-
-      var p1 = edgePoint(A.cx, A.cy, A.hw, A.hh, dx, dy);
-      var p2 = edgePoint(B.cx, B.cy, B.hw, B.hh, -dx, -dy);
-
-      var color = "#000000";
-      var toPop = pops.find(function(pp){ return pp.id === l.to; });
-      if (toPop && toPop.color) color = toPop.color;
-
-      var elWire = document.createElementNS(NS, "line");
-      elWire.setAttribute("x1", p1.x);
-      elWire.setAttribute("y1", p1.y);
-      elWire.setAttribute("x2", p2.x);
-      elWire.setAttribute("y2", p2.y);
-
-      elWire.setAttribute("marker-end", "url(#arrow)");
-
-      elWire.classList.add("linkLine");
-      elWire.dataset.linkid = l.id;
-      elWire.style.stroke = color;
-
-      if (l.id === selectedLinkId) elWire.classList.add("selected");
-
-      function handlePointerDown(e){
-        e.stopPropagation();
-        setLinkMode(false);
-        selectLink(l.id);
-      }
-
-      elWire.addEventListener("pointerdown", handlePointerDown);
-
-      wires.appendChild(elWire);
-    });
-  }
-
-  function render(){
-    viewport.innerHTML = "";
-    pops.forEach(function(p){
-      var el = document.createElement("div");
-      el.className = "pop";
-      el.dataset.id = p.id;
-      el.style.left = p.x + "px";
-      el.style.top  = p.y + "px";
-
-      el.style.borderColor = p.color || "#000000";
-
-      el.innerHTML = '<textarea class="body" spellcheck="false"></textarea>';
-      var ta = el.querySelector(".body");
-      ta.value = p.text || "";
-
-      var fontSizePx = (p.size === "large") ? "20px" : "14px";
-      ta.style.fontSize = fontSizePx;
-      ta.style.fontWeight = p.bold ? "700" : "400";
-      ta.style.color = p.color || "#000000";
-
-      autoGrow(ta, p);
-
-      if (p.id === selectedBoxId) el.classList.add("selected");
-      if (p.id === linkingFrom) el.classList.add("linking");
-
-      ta.addEventListener("focus", function () { selectBox(p.id); });
-      ta.addEventListener("mousedown", function (e) {
-        selectBox(p.id);
-        if (linkingFrom && linkingFrom !== p.id) e.preventDefault();
-      });
-
-      ta.addEventListener("input", function (e) {
-        p.text = e.target.value;
-        autoGrow(ta, p);
-        renderLinks();
-      });
-
-      el.addEventListener("click", function () {
-        if (linkingFrom && linkingFrom !== p.id) {
-          addLink(linkingFrom, p.id);
-          setLinkMode(false);
-          renderLinks();
-          setStatus("Collegamento creato.");
-        }
-      });
-
-      var dragging = false;
-      var sx=0, sy=0, ox=0, oy=0;
-
-      el.addEventListener("pointerdown", function(e){
-        if (e.button !== 0) return;
-        if (!moveMode && e.target && e.target.tagName && e.target.tagName.toLowerCase() === "textarea") return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        setLinkMode(false);
-        selectBox(p.id);
-
-        dragging = true;
-        sx = e.clientX; sy = e.clientY;
-        ox = p.x; oy = p.y;
-
-        if (el.setPointerCapture) el.setPointerCapture(e.pointerId);
-
-        function onMove(ev) {
-          if (!dragging) return;
-          var dx = (ev.clientX - sx)/view.s;
-          var dy = (ev.clientY - sy)/view.s;
-          p.x = ox + dx;
-          p.y = oy + dy;
-          el.style.left = p.x + "px";
-          el.style.top  = p.y + "px";
-          renderLinks();
-        }
-        function onUp(ev) {
-          dragging = false;
-          if (el.releasePointerCapture) el.releasePointerCapture(ev.pointerId);
-          document.removeEventListener("pointermove", onMove);
-          document.removeEventListener("pointerup", onUp);
-        }
-        document.addEventListener("pointermove", onMove);
-        document.addEventListener("pointerup", onUp);
-      });
-
-      viewport.appendChild(el);
-    });
-
-    renderLinks();
-    updateTextControls();
-  }
-
-  btnNew.addEventListener("click", function(){
-    var center = screenToWorld(board.clientWidth/2, board.clientHeight/2);
-    createPop(center.x, center.y);
-  });
-
-  btnMove.addEventListener("click", function(){
-    setMoveMode(!moveMode);
-  });
-
-  btnLink.addEventListener("click", function(){
-    setLinkMode(!linkingFrom);
-  });
-
-  btnDelete.addEventListener("click", function(){
-    deleteSelected();
-  });
-
-  btnExportJson.addEventListener("click", function(){
-    var data = {
-      version:1,
-      pops:pops,
-      links:links
-    };
-    var blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "mappa-mentale.json";
-    a.click();
-  });
-
-  btnExportHtml.addEventListener("click", function(){
-    alert("Per ora usa Esporta JSON e poi apri questo file sulla stessa pagina.");
-  });
-
-  btnImport.addEventListener("click", function(){
-    var inp = document.createElement("input");
-    inp.type = "file";
-    inp.accept = ".json,application/json";
-    inp.addEventListener("change", function(){
-      var f = inp.files[0];
-      if (!f) return;
-      var reader = new FileReader();
-      reader.onload = function(ev){
-        try{
-          var data = JSON.parse(ev.target.result);
-          if (data.pops && data.links){
-            pops = data.pops;
-            links = data.links;
-            render();
-            setStatus("Mappa caricata.");
-          }
-        }catch(e){
-          alert("File non valido.");
-        }
-      };
-      reader.readAsText(f);
-    });
-    inp.click();
-  });
-
-  btnSmaller.addEventListener("click", function(){
-    if (!selectedBoxId) return;
-    var p = getPopById(selectedBoxId);
-    if (!p) return;
-    p.size = "small";
-    render();
-    selectBox(p.id);
-  });
-
-  btnBigger.addEventListener("click", function(){
-    if (!selectedBoxId) return;
-    var p = getPopById(selectedBoxId);
-    if (!p) return;
-    p.size = "large";
-    render();
-    selectBox(p.id);
-  });
-
-  btnBold.addEventListener("click", function(){
-    if (!selectedBoxId) return;
-    var p = getPopById(selectedBoxId);
-    if (!p) return;
-    p.bold = !p.bold;
-    var ta = document.querySelector('.pop[data-id="'+p.id+'"] .body');
-    if (ta) ta.style.fontWeight = p.bold ? "700" : "400";
-    updateTextControls();
-    resizeSelectedTextarea();
-  });
-
-  colorPicker.addEventListener("input", function(){
-    if (!selectedBoxId) return;
-    var p = getPopById(selectedBoxId);
-    if (!p) return;
-    p.color = colorPicker.value;
-    render();
-    selectBox(p.id);
-  });
-
-  board.addEventListener("wheel", function(e){
-    if (!e.ctrlKey) return;
-    e.preventDefault();
-    var delta = -e.deltaY;
-    var factor = delta > 0 ? 1.1 : 0.9;
-    var mouseBefore = screenToWorld(e.clientX, e.clientY);
-    view.s *= factor;
-    view.s = Math.max(0.35, Math.min(2.8, view.s));
-    var mouseAfter = screenToWorld(e.clientX, e.clientY);
-    view.x += (mouseAfter.x - mouseBefore.x)*view.s;
-    view.y += (mouseAfter.y - mouseBefore.y)*view.s;
-    applyView();
-    renderLinks();
-  }, {passive:false});
-
-  function zoomAt(centerX, centerY, factor){
-    var before = screenToWorld(centerX, centerY);
-    view.s *= factor;
-    view.s = Math.max(0.35, Math.min(2.8, view.s));
-    var after = screenToWorld(centerX, centerY);
-    view.x += (after.x - before.x)*view.s;
-    view.y += (after.y - before.y)*view.s;
-    applyView();
-    renderLinks();
-  }
-
-  zoomInBtn.addEventListener("click", function(){
-    zoomAt(board.clientWidth/2, board.clientHeight/2, 1.15);
-  });
-  zoomOutBtn.addEventListener("click", function(){
-    zoomAt(board.clientWidth/2, board.clientHeight/2, 1/1.15);
-  });
-
-  render();
-  setStatus("Pronto");
-})();
-</script>
+  </script>
 </body>
 </html>
